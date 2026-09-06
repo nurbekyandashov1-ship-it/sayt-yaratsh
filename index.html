@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nurbek IT Servis — Veb-Sayt va SMM Xizmatlari</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background-color: #0b0f19;
+            color: #f1f5f9;
+            line-height: 1.5;
+            padding-bottom: 50px;
+        }
+        .container {
+            max-width: 1050px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* --- RGB NEON HEADER & LOGO --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #1e293b;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #ff007f, #00f0ff, #7000ff, #ff007f);
+            background-size: 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rgbGlow 6s linear infinite;
+            filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.4));
+        }
+        @keyframes rgbGlow {
+            0% { background-position: 0%; }
+            100% { background-position: 300%; }
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .btn-auth {
+            background: #1e293b;
+            color: #38bdf8;
+            border: 1px solid #38bdf8;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-auth:hover {
+            background: #38bdf8;
+            color: #0b0f19;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+        .btn-admin {
+            background: #eab308;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            display: none;
+        }
+        .user-profile-badge {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            color: #38bdf8;
+            font-weight: bold;
+        }
+        .btn-logout {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        /* --- HERO & CARDS SECTION --- */
+        .hero {
+            text-align: center;
+            padding: 40px 10px 20px;
+        }
+        .hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            color: #f8fafc;
+            margin-bottom: 8px;
+        }
+        .hero p { color: #94a3b8; }
+        
+        .section-title {
+            font-size: 1.35rem;
+            margin: 35px 0 20px;
+            color: #f8fafc;
+            font-weight: 700;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: 0.2s;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        .card:hover {
+            border-color: #38bdf8;
+            transform: translateY(-2px);
+        }
+        .card h3 { color: #38bdf8; font-size: 1.25rem; margin-bottom: 6px; }
+        .card .subtitle { color: #94a3b8; font-size: 0.88rem; margin-bottom: 12px; }
+        .card .price { font-size: 1.5rem; font-weight: 800; color: #4ade80; margin: 8px 0 16px; }
+        .card ul { list-style: none; color: #cbd5e1; font-size: 0.9rem; margin-bottom: 20px; border-top: 1px solid #1e293b; padding-top: 14px; }
+        .card ul li { margin-bottom: 8px; position: relative; padding-left: 20px; }
+        .card ul li::before { content: "✓"; position: absolute; left: 0; color: #38bdf8; font-weight: bold; }
+        .btn { display: block; text-align: center; background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; text-decoration: none; padding: 12px; border-radius: 10px; font-weight: 600; }
+
+        /* --- ADMIN DASHBOARD PANEL --- */
+        #adminPanel, #userChatPanel {
+            display: none;
+            background: #0f172a;
+            border: 1px solid #eab308;
+            border-radius: 16px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 0 20px rgba(234, 179, 8, 0.15);
+        }
+        #userChatPanel { border-color: #38bdf8; box-shadow: 0 0 20px rgba(56, 189, 248, 0.15); }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card { background: #1e293b; padding: 15px; border-radius: 10px; text-align: center; }
+        .stat-card h4 { color: #94a3b8; font-size: 0.85rem; }
+        .stat-card p { font-size: 1.5rem; font-weight: bold; color: #38bdf8; }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            color: #cbd5e1;
+            font-size: 0.88rem;
+        }
+        .data-table th, .data-table td { border: 1px solid #334155; padding: 10px; text-align: left; }
+        .data-table th { background: #1e293b; color: #38bdf8; }
+
+        /* --- CHAT BOX --- */
+        .chat-box {
+            background: #1e293b;
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .chat-msg {
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 3px solid #38bdf8;
+        }
+        .chat-msg .sender { font-weight: bold; color: #38bdf8; font-size: 0.85rem; }
+        .chat-msg .time { color: #64748b; font-size: 0.75rem; float: right; }
+        .chat-input-group { display: flex; gap: 10px; }
+        .chat-input-group input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #0b0f19;
+            color: #fff;
+        }
+
+        /* --- MODAL FORM --- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .modal-content {
+            background: #111827;
+            border: 1px solid #38bdf8;
+            border-radius: 16px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.2);
+            position: relative;
+        }
+        .close-btn {
+            position: absolute;
+            top: 12px; right: 16px;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .modal h2 { margin-bottom: 20px; color: #38bdf8; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.88rem; color: #94a3b8; }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #1e293b;
+            background: #0b0f19;
+            color: #fff;
+            outline: none;
+        }
+        .form-group input:focus { border-color: #38bdf8; }
+        .submit-btn {
+            width: 100%;
+            padding: 10px;
+            background: #0284c7;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 24px 0;
+            border-top: 1px solid #1e293b;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 640px) {
+            header { flex-direction: column; gap: 15px; text-align: center; }
+            .data-table { font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="logo">⚡ Nurbek IT Servis</div>
+        <div class="auth-buttons" id="authNav">
+            <button class="btn-admin" id="adminBtn" onclick="toggleAdminPanel()">👑 Admin Panel</button>
+            <div class="user-profile-badge" id="userBadge">
+                <span id="userNameDisplay">Ism Familiya</span>
+                <button class="btn-logout" onclick="logout()">Chiqish</button>
+            </div>
+            <button class="btn-auth" id="loginBtn" onclick="openModal('login')">Kirish</button>
+            <button class="btn-auth" id="regBtn" onclick="openModal('reg')">Ro'yxatdan o'tish</button>
+        </div>
+    </header>
+
+    <!-- ADMIN DASHBOARD PANEL -->
+    <div id="adminPanel">
+        <h2 style="color: #eab308;">👑 Admin Boshqaruv Paneli (Nurbek)</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h4>Noyob Qurilmalar Tashrifi</h4>
+                <p id="totalVisits">0</p>
+            </div>
+            <div class="stat-card">
+                <h4>Ro'yxatdan O'tganlar</h4>
+                <p id="totalUsers">0</p>
+            </div>
+            <div class="stat-card">
+                <h4>Faol Qurilma</h4>
+                <p id="activeDevices">Mobile / PC</p>
+            </div>
+        </div>
+
+        <h3 style="color: #f8fafc; margin-bottom: 10px;">Foydalanuvchilar yo'llagan xabarlar</h3>
+        <div class="chat-box" id="adminChatBox"></div>
+
+        <h3 style="color: #f8fafc; margin: 20px 0 10px;">Foydalanuvchilar va Kirgan Qurilmalar (So'nggi 7 Kun)</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Ism Familiya</th>
+                    <th>Username / Device ID</th>
+                    <th>Roli</th>
+                    <th>Qurilma / OS</th>
+                    <th>Sana va Vaqt</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- USER CHAT PANEL -->
+    <div id="userChatPanel">
+        <h3 style="color: #38bdf8; margin-bottom: 10px;">💬 Adminga (Nurbekka) xabar yozish</h3>
+        <div class="chat-box" id="userChatBox">
+            <div class="chat-msg">
+                <span class="sender">Nurbek IT Servis Admin</span>: Assalomu alaykum! Qanday xizmat ko'rsatishimiz mumkin?
+            </div>
+        </div>
+        <div class="chat-input-group">
+            <input type="text" id="chatMessageInput" placeholder="Xabaringizni yozing...">
+            <button class="btn-auth" onclick="sendMessage()">Yuborish</button>
+        </div>
+    </div>
+
+    <div class="hero">
+        <h1>Veb-Sayt Yaratish va SMM Xizmatlari</h1>
+        <p>Biznesingiz uchun tezkor, sifatli va zamonaviy yechimlar</p>
+    </div>
+
+    <!-- VEB SAYT YARATISH TARIFLARI -->
+    <div class="section-title">🌐 Veb-Sayt Yaratish</div>
+    <div class="grid">
+        <div class="card">
+            <div>
+                <h3>Landing Page (Oddiy)</h3>
+                <p class="subtitle">1 sahifali tezkor va ma'lumot beruvchi sayt</p>
+                <div class="price">300 000 so'm</div>
+                <ul>
+                    <li>Asosiy xizmatlar ko'rinishi</li>
+                    <li>Aloqa ma'lumotlari bo'limi</li>
+                    <li>Telegram tugmasi va havola</li>
+                    <li>Mobil moslashuvchanlik</li>
+                </ul>
+            </div>
+            <a href="https://t.me/nurbek_yandashov1" target="_blank" class="btn">Buyurtma berish</a>
+        </div>
+
+        <div class="card">
+            <div>
+                <h3>Vizitka / Biznes Sayt</h3>
+                <p class="subtitle">3-4 sahifali rasmiy korporativ sayt</p>
+                <div class="price">500 000 so'm</div>
+                <ul>
+                    <li>Bosh sahifa, Biz haqimizda, Xizmatlar, Aloqa</li>
+                    <li>Loyiha va fotogalereya bo'limi</li>
+                    <li>Mijozlar sharhlari bloki</li>
+                    <li>Interaktiv aloqa shakli (Forma)</li>
+                    <li>Tez yuklanish va responsive dizayn</li>
+                </ul>
+            </div>
+            <a href="https://t.me/nurbek_yandashov1" target="_blank" class="btn">Buyurtma berish</a>
+        </div>
+
+        <div class="card">
+            <div>
+                <h3>Professional Tovarlar Sayti</h3>
+                <p class="subtitle">Admin panelli mukammal internet do'kon</p>
+                <div class="price">700 000 so'm</div>
+                <ul>
+                    <li>Boshqaruv paneli (Admin panel)</li>
+                    <li>Mahsulot qo'shish va tahrirlash</li>
+                    <li>Katalog va mahsulotlar filtri</li>
+                    <li>Savat (Cart) va izlash tizimi</li>
+                    <li>Buyurtmalarni Telegramga yuborish</li>
+                </ul>
+            </div>
+            <a href="https://t.me/nurbek_yandashov1" target="_blank" class="btn">Buyurtma berish</a>
+        </div>
+
+        <div class="card" style="border-color: #eab308;">
+            <div>
+                <h3>Business Pro Web-sayt</h3>
+                <p class="subtitle">Mukammal va animatsiyali biznes platformasi</p>
+                <div class="price">1 000 000 so'm</div>
+                <ul>
+                    <li>UI/UX dizayn va interaktiv animatsiyalar</li>
+                    <li>Barcha qurilmalarga mukammal moslik</li>
+                    <li>SEO optimallashtirish (Google)</li>
+                    <li>Telegram-bot orqali bildirishnomalar</li>
+                    <li>1 yillik bepul texnik qo'llab-quvvatlash</li>
+                </ul>
+            </div>
+            <a href="https://t.me/nurbek_yandashov1" target="_blank" class="btn">Buyurtma berish</a>
+        </div>
+
+        <div class="card" style="border-color: #0284c7;">
+            <div>
+                <h3>Ziyo Lider Platformasi</h3>
+                <p class="subtitle">O'quv markazlari uchun avtomatlashtirilgan tizim</p>
+                <div class="price">1 200 000 so'm</div>
+                <ul>
+                    <li>Ustoz, Menejer va O'quvchi kabinetlari</li>
+                    <li>Ball, tanga va darajalar tizimi</li>
+                    <li>30 kunlik baholar va davomat kalendari</li>
+                    <li>Academic Shop va shikoyat paneli</li>
+                </ul>
+            </div>
+            <a href="https://t.me/nurbek_yandashov1" target="_blank" class="btn">Buyurtma berish</a>
+        </div>
+
+        <div class="card" style="border-color: #ec4899;">
+            <div>
+                <h3>Enterprise Pro Ultra</h3>
+                <p class="subtitle">Eng oliy darajadagi platforma</p>
+                <div class="price">1 500 000 so'm</div>
+                <ul>
+                    <li>To'lov tizimlari (Click, Payme, Uzum)</li>
+                    <li>Target va Reklama tayyorgarligi</li>
+                    <li>Ko'p tilli qo'llab-quvvatlash</li>
+                    <li>CRM tizimi integratsiyasi</li>
+                    <li>24/7 shaxsiy dasturchi xizmati</li>
+                </ul>
+            </div>
+            <a href="https://t.me/nurbek_yandashov1" target="_blank" class="btn">Buyurtma berish</a>
+        </div>
+    </div>
+
+    <!-- INSTAGRAM SMM XIZMATLARI -->
+    <div class="section-title">📱 Instagram SMM Xizmatlari</div>
+    <div class="grid">
+        <div class="card">
+            <div>
+                <h3>Obunachilar (Followers)</h3>
+                <p class="subtitle">1 000 ta obunachi</p>
+                <div class="price">30 000 so'm</div>
+                <ul>
+                    <li>Profil nufuzini oshirish</li>
+                    <li>Sifatli va tezkor yetkazib berish</li>
+                </ul>
+            </div>
+            <a href="https://t.me/nurbek_yandashov1" target="_blank" class="btn">Buyurtma berish</a>
+        </div>
+
+        <div class="card">
+            <div>
+                <h3>Layklar (Likes)</h3>
+                <p class="subtitle">1 000 ta layk</p>
+                <div class="price">10 000 so'm</div>
+                <ul>
+                    <li>Postlar faolligini ko'tarish</li>
+                    <li>Reels va fotolar uchun mos</li>
+                </ul>
+            </div>
+            <a href="https://t.me/nurbek_yandashov1" target="_blank" class="btn">Buyurtma berish</a>
+        </div>
+
+        <div class="card">
+            <div>
+                <h3>Ko'rishlar (Views)</h3>
+                <p class="subtitle">100 000 ta ko'rish</p>
+                <div class="price">10 000 so'm</div>
+                <ul>
+                    <li>Reels video ko'rishlar sonini oshirish</li>
+                    <li>Tavsiyalar bo'limiga chiqish imkoniyati</li>
+                </ul>
+            </div>
+            <a href="https://t.me/nurbek_yandashov1" target="_blank" class="btn">Buyurtma berish</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Murojaat uchun Telegram: <a href="https://t.me/nurbek_yandashov1" style="color: #38bdf8; text-decoration: none;">@nurbek_yandashov1</a></p>
+    </footer>
+</div>
+
+<!-- MODAL LOGIN/REGISTER -->
+<div class="modal" id="authModal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 id="modalTitle">Tizimga Kirish</h2>
+        <form onsubmit="handleAuth(event)">
+            <div class="form-group" id="fullNameGroup" style="display: none;">
+                <label>Ism va Familiyangiz</label>
+                <input type="text" id="fullNameInput" placeholder="Masalan: Ali Valiyev">
+            </div>
+            <div class="form-group">
+                <label>Login / Username</label>
+                <input type="text" id="usernameInput" placeholder="Loginni kiriting" required>
+            </div>
+            <div class="form-group">
+                <label>Parol</label>
+                <input type="password" id="passwordInput" placeholder="Parolni kiriting" required>
+            </div>
+            <button type="submit" class="submit-btn" id="modalSubmitBtn">Kirish</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const ADMIN_USER = "nurbekyandashev1";
+    const ADMIN_PASS = "ae5330506";
+    let authMode = "login";
+
+    function getDeviceInfo() {
+        const ua = navigator.userAgent;
+        if (/android/i.test(ua)) return "Android Phone";
+        if (/iPad|iPhone|iPod/i.test(ua)) return "iOS Mobile";
+        if (/windows/i.test(ua)) return "Windows PC";
+        if (/mac/i.test(ua)) return "Mac PC";
+        return "Noma'lum Qurilma";
+    }
+
+    // Get or Create Unique Device ID (Fingerprint)
+    function getOrCreateDeviceId() {
+        let deviceId = localStorage.getItem('unique_device_id');
+        if (!deviceId) {
+            deviceId = 'dev_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now().toString(36);
+            localStorage.setItem('unique_device_id', deviceId);
+        }
+        return deviceId;
+    }
+
+    // ON PAGE LOAD LOGIC
+    window.onload = function() {
+        recordUniqueVisit();
+        cleanOldGuestVisits();
+
+        const savedUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (savedUser) {
+            applyLoginState(savedUser);
+        }
+
+        renderUserTable();
+        loadMessages();
+    };
+
+    // Record Visit ONLY ONCE per unique device
+    function recordUniqueVisit() {
+        const deviceId = getOrCreateDeviceId();
+        const savedUser = JSON.parse(localStorage.getItem('currentUser'));
+        let logList = JSON.parse(localStorage.getItem('accessLogs')) || [];
+
+        // Check default admin presence in log
+        const hasAdmin = logList.some(item => item.username === ADMIN_USER);
+        if (!hasAdmin) {
+            logList.unshift({
+                deviceId: 'admin_device_001',
+                name: "Nurbek Yandashov",
+                username: ADMIN_USER,
+                role: "ADMIN",
+                device: getDeviceInfo(),
+                time: new Date().toLocaleString('uz-UZ'),
+                timestamp: Date.now(),
+                isGuest: false
+            });
+        }
+
+        // Check if THIS device ID already exists in logs
+        const existingLogIndex = logList.findIndex(item => item.deviceId === deviceId);
+
+        if (existingLogIndex === -1) {
+            // BRAND NEW DEVICE: Add to logs
+            logList.push({
+                deviceId: deviceId,
+                name: savedUser ? savedUser.name : "Mehmon (Tashrif buyuruvchi)",
+                username: savedUser ? savedUser.username : deviceId.substr(0, 10),
+                role: savedUser ? savedUser.role : "Tashrifchi",
+                device: getDeviceInfo(),
+                time: new Date().toLocaleString('uz-UZ'),
+                timestamp: Date.now(),
+                isGuest: !savedUser
+            });
+        } else {
+            // ALREADY KNOWN DEVICE: Only update status if user logged in
+            if (savedUser && logList[existingLogIndex].isGuest) {
+                logList[existingLogIndex].name = savedUser.name;
+                logList[existingLogIndex].username = savedUser.username;
+                logList[existingLogIndex].role = savedUser.role;
+                logList[existingLogIndex].isGuest = false;
+            }
+        }
+
+        localStorage.setItem('accessLogs', JSON.stringify(logList));
+    }
+
+    // Clean guest devices older than 7 days (1 week)
+    function cleanOldGuestVisits() {
+        let logList = JSON.parse(localStorage.getItem('accessLogs')) || [];
+        const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+        const now = Date.now();
+
+        logList = logList.filter(item => {
+            if (item.isGuest) {
+                return (now - item.timestamp) < SEVEN_DAYS_MS;
+            }
+            return true; // Keep registered accounts forever
+        });
+
+        localStorage.setItem('accessLogs', JSON.stringify(logList));
+    }
+
+    function renderUserTable() {
+        const logList = JSON.parse(localStorage.getItem('accessLogs')) || [];
+        const tbody = document.getElementById('userTableBody');
+        tbody.innerHTML = '';
+
+        let registeredCount = 0;
+
+        logList.forEach(item => {
+            if (!item.isGuest && item.role !== 'ADMIN') registeredCount++;
+
+            const row = document.createElement('tr');
+            const roleStyle = item.role === 'ADMIN' 
+                ? '<span style="color: #eab308; font-weight: bold;">ADMIN</span>' 
+                : (item.isGuest ? '<span style="color: #64748b;">MEHMON</span>' : '<span style="color: #38bdf8;">FOYDALANUVCHI</span>');
+
+            row.innerHTML = `
+                <td>${item.name}</td>
+                <td>${item.username}</td>
+                <td>${roleStyle}</td>
+                <td>${item.device}</td>
+                <td>${item.time}</td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        // Total visits count is strictly equal to unique recorded devices
+        document.getElementById('totalVisits').innerText = logList.length;
+        document.getElementById('totalUsers').innerText = registeredCount + 1; // Including admin
+    }
+
+    function openModal(mode) {
+        authMode = mode;
+        document.getElementById('authModal').style.display = 'flex';
+        if (mode === 'login') {
+            document.getElementById('modalTitle').innerText = "Tizimga Kirish";
+            document.getElementById('modalSubmitBtn').innerText = "Kirish";
+            document.getElementById('fullNameGroup').style.display = "none";
+        } else {
+            document.getElementById('modalTitle').innerText = "Ro'yxatdan O'tish";
+            document.getElementById('modalSubmitBtn').innerText = "Ro'yxatdan o'tish";
+            document.getElementById('fullNameGroup').style.display = "block";
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('authModal').style.display = 'none';
+    }
+
+    function handleAuth(e) {
+        e.preventDefault();
+        const user = document.getElementById('usernameInput').value;
+        const pass = document.getElementById('passwordInput').value;
+        const fullName = document.getElementById('fullNameInput').value || user;
+
+        let userData = {};
+        const deviceId = getOrCreateDeviceId();
+
+        if (authMode === 'login') {
+            if (user === ADMIN_USER && pass === ADMIN_PASS) {
+                userData = { username: user, name: "Nurbek (ADMIN)", role: 'ADMIN' };
+            } else {
+                userData = { username: user, name: user, role: 'USER' };
+            }
+        } else {
+            userData = { username: user, name: fullName, role: 'USER' };
+            alert("Muvaffaqiyatli ro'yxatdan o'tdingiz!");
+        }
+
+        // Update current user log in device list
+        let logList = JSON.parse(localStorage.getItem('accessLogs')) || [];
+        const existingLogIndex = logList.findIndex(item => item.deviceId === deviceId);
+
+        if (existingLogIndex !== -1) {
+            logList[existingLogIndex].name = userData.name;
+            logList[existingLogIndex].username = userData.username;
+            logList[existingLogIndex].role = userData.role;
+            logList[existingLogIndex].isGuest = false;
+        } else {
+            logList.push({
+                deviceId: deviceId,
+                name: userData.name,
+                username: userData.username,
+                role: userData.role,
+                device: getDeviceInfo(),
+                time: new Date().toLocaleString('uz-UZ'),
+                timestamp: Date.now(),
+                isGuest: false
+            });
+        }
+
+        localStorage.setItem('accessLogs', JSON.stringify(logList));
+        localStorage.setItem('currentUser', JSON.stringify(userData));
+
+        applyLoginState(userData);
+        renderUserTable();
+        closeModal();
+    }
+
+    function applyLoginState(userData) {
+        document.getElementById('loginBtn').style.display = 'none';
+        document.getElementById('regBtn').style.display = 'none';
+        document.getElementById('userBadge').style.display = 'flex';
+        document.getElementById('userNameDisplay').innerText = userData.name;
+
+        if (userData.role === 'ADMIN') {
+            document.getElementById('adminBtn').style.display = 'inline-block';
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('userChatPanel').style.display = 'none';
+        } else {
+            document.getElementById('adminBtn').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('userChatPanel').style.display = 'block';
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('currentUser');
+        location.reload();
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('chatMessageInput');
+        const text = input.value.trim();
+        if (!text) return;
+
+        const savedUser = JSON.parse(localStorage.getItem('currentUser')) || { name: 'Mehmon' };
+        const msgObj = {
+            sender: savedUser.name,
+            text: text,
+            time: new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })
+        };
+
+        let messages = JSON.parse(localStorage.getItem('siteMessages')) || [];
+        messages.push(msgObj);
+        localStorage.setItem('siteMessages', JSON.stringify(messages));
+
+        input.value = '';
+        loadMessages();
+    }
+
+    function loadMessages() {
+        let messages = JSON.parse(localStorage.getItem('siteMessages')) || [];
+        const userChatBox = document.getElementById('userChatBox');
+        const adminChatBox = document.getElementById('adminChatBox');
+
+        let chatHtml = `<div class="chat-msg"><span class="sender">Admin</span>: Assalomu alaykum!</div>`;
+        let adminHtml = ``;
+
+        messages.forEach(msg => {
+            chatHtml += `
+                <div class="chat-msg">
+                    <span class="sender">${msg.sender}</span> <span class="time">${msg.time}</span>
+                    <div>${msg.text}</div>
+                </div>
+            `;
+            adminHtml += `
+                <div class="chat-msg">
+                    <span class="sender">${msg.sender}</span> <span class="time">${msg.time}</span>
+                    <div>${msg.text}</div>
+                </div>
+            `;
+        });
+
+        if (userChatBox) userChatBox.innerHTML = chatHtml;
+        if (adminChatBox) adminChatBox.innerHTML = adminHtml || '<p style="color: #64748b;">Hozircha xabarlar yo\'q.</p>';
+    }
+
+    function toggleAdminPanel() {
+        const panel = document.getElementById('adminPanel');
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+</script>
+
+</body>
+</html>
